@@ -23,5 +23,5 @@ jobs:
             - name: Run bot script
               env:
                   DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-              run: node your-bot-file.js # Replace with the entry point of your bot
+              run: node bot.js # Replace with the entry point of your bot
 
