@@ -2,7 +2,9 @@ name: Schedule Discord Bot
 
 on:
     schedule:
-        - cron: '0 17 * * 0' # Every Sunday at 10:00 AM Arizona time (5:00 PM UTC)
+        - cron: "0 17 * * 0" # Every Sunday at 10:00 AM Arizona time (5:00 PM UTC)
+    branches:
+        - main
 
 jobs:
     run-bot:
