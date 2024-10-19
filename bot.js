@@ -12,8 +12,6 @@ const client = new Client({
 client.once("ready", async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
-    // Schedule a task to run every Sunday at 10 AM
-    // cron.schedule("0 10 * * 0", () => {
     const channel = client.channels.cache.get(CHANNEL_ID);
     if (channel) {
         // Fetch scheduled events for the guild (server)
@@ -82,7 +80,9 @@ client.once("ready", async () => {
     } else {
         console.log("Channel not found!");
     }
-    // });
+
+    // Exit the process after sending all messages
+    process.exit();
 });
 
 client.login(TOKEN);
