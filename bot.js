@@ -20,53 +20,65 @@ client.once("ready", async () => {
         const guild = channel.guild;
         const events = await guild.scheduledEvents.fetch();
 
-        // Format the events into messages
-        const eventMessages = events.map((event) => {
-            console.log("event:", event);
-            return (
-                `**${event?.name}**\n` +
-                `📍 Location: ${event?.entityMetadata?.location}\n` +
-                `📝 Description: ${event?.description}\n` +
-                `🕒 Start: ${event?.scheduledStartTimestamp?.toLocaleString()}\n` +
-                `🕒 End: ${event?.scheduledEndTimestamp?.toLocaleString()}\n` +
-                "---"
-            ); // Separator between events
+        // Format the events into a message
+        const options = {
+            year: "numeric",
+            month: "long", // Full month name
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true, // 12-hour format
+        };
+
+        // Create the event list with formatted strings
+        const eventList = events.map((event) => {
+            const startDate = new Date(event?.scheduledStartTimestamp);
+            const endDate = new Date(event?.scheduledEndTimestamp);
+
+            return {
+                message:
+                    `**Event:** ${event?.name}\n` +
+                    `**Location:** ${event?.entityMetadata?.location}\n` +
+                    `**Description:** ${event?.description}\n` +
+                    `**Start Time:** ${startDate.toLocaleString(
+                        "en-US",
+                        options
+                    )}\n` +
+                    `**End Time:** ${endDate.toLocaleString("en-US", options)}`,
+                length:
+                    event?.name.length +
+                    event?.entityMetadata?.location.length +
+                    event?.description.length +
+                    100, // Rough estimate for length
+            };
         });
+
+        // Initialize the base message
+        let baseMessage = `🚨 **Event Reminder Announcement!** 🚨\n\nHere are all scheduled events:\n\n`;
+
+        // Send the announcement message first
+        await channel.send(baseMessage);
 
         // Send each event message separately
-        eventMessages.forEach(async (message) => {
-            try {
-                // Check if the message length exceeds 2000 characters
-                if (message.length > 2000) {
-                    // Truncate the message to 1997 characters and add '...'
-                    message = message.slice(0, 1997) + "...";
-                }
+        for (const event of eventList) {
+            const eventMessage = event.message;
 
-                await channel.send(message); // Send the message to the channel
-            } catch (error) {
-                // Handle the error if it occurs
-                console.error("Error sending message:", error);
-
-                // Check if the error is related to message length
-                if (error.rawError?.errors?.content?._errors) {
-                    error.rawError.errors.content._errors.forEach((err) => {
-                        if (
-                            err.message ===
-                                "Must be 2000 or fewer in length." &&
-                            err.code === "BASE_TYPE_MAX_LENGTH"
-                        ) {
-                            console.error(
-                                "Message exceeded maximum length:",
-                                message
-                            );
-                        }
-                    });
-                }
+            // Check if the individual message exceeds the character limit
+            if (eventMessage.length > 2000) {
+                // If it exceeds, truncate and send the message
+                const truncatedMessage = eventMessage.slice(0, 1997) + "...";
+                await channel.send(truncatedMessage);
+            } else {
+                // Send the event message directly
+                await channel.send(eventMessage);
             }
-        });
 
-        // Send a final message to encourage participation
-        channel.send(`Stay active and see you there!`);
+            // Send a separator after each event for clarity
+            await channel.send("---"); // Clear separator for each event
+        }
+
+        // Notify users to stay active at the end
+        await channel.send("Stay active and see you there! 🎉");
     } else {
         console.log("Channel not found!");
     }
