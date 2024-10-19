@@ -3,8 +3,7 @@ name: Schedule Discord Bot
 on:
     schedule:
         - cron: "0 17 * * 0" # Every Sunday at 10:00 AM Arizona time (5:00 PM UTC)
-    branches:
-        - main
+    workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
     run-bot:
@@ -16,7 +15,7 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v2
               with:
-                  node-version: "20.14.0" # or the version you're using
+                  node-version: "16" # or the version you're using
 
             - name: Install dependencies
               run: npm install
@@ -24,4 +23,5 @@ jobs:
             - name: Run bot script
               env:
                   DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-              run: node bot.js # Replace with the entry point of your bot
+              run: node your-bot-file.js # Replace with the entry point of your bot
+
