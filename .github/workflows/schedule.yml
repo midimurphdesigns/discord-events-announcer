@@ -23,5 +23,6 @@ jobs:
             - name: Run bot script
               env:
                   DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+                  CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
               run: node bot.js # Replace with the entry point of your bot
 
